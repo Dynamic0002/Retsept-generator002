@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Рецептура яратиш</title>
+<style>
+  :root{
+    --gold:#D6AE37; --gold-deep:#C29E2E;
+    --green:#76AD4E; --green-deep:#5E9039;
+    --peach:#F4CBA4;
+    --ink:#161616; --line:#2b2b2b;
+    --bg:#EFEADD; --card:#FFFFFF;
+    --muted:#6c6658; --soft:#F6F2E8; --edge:#E2DBC9;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.45;}
+  .wrap{max-width:1080px;margin:0 auto;padding:22px 18px 70px;}
+  header.top{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
+  .mark{width:44px;height:44px;border-radius:10px;flex:0 0 auto;
+    background:linear-gradient(135deg,var(--gold) 0 50%, var(--green) 50% 100%);
+    box-shadow:0 2px 0 rgba(0,0,0,.15) inset,0 4px 12px rgba(0,0,0,.12);}
+  h1{font-size:23px;margin:0;}
+  .sub{color:var(--muted);font-size:13px;margin-top:2px;}
+
+  .card{background:var(--card);border:1px solid var(--edge);border-radius:14px;padding:18px;margin-bottom:18px;
+        box-shadow:0 8px 26px rgba(40,30,10,.05);}
+  .card h2{font-size:12.5px;text-transform:uppercase;letter-spacing:1.3px;color:var(--muted);margin:0 0 14px;font-weight:700;}
+  label{display:block;font-size:12.5px;font-weight:600;margin-bottom:5px;color:#3b362c;}
+  input[type=text],input[type=number],select{font:inherit;font-size:14px;padding:9px 11px;border:1px solid #d5cdb8;
+    border-radius:9px;background:#fff;color:var(--ink);outline:none;transition:border-color .15s,box-shadow .15s;}
+  input:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(118,173,78,.18);}
+  .hint{font-size:11.5px;color:var(--muted);margin-top:6px;}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;}
+  .kgbox{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+  .kgchip{display:inline-flex;align-items:center;gap:7px;background:var(--soft);border:1px solid var(--edge);
+    border-radius:9px;padding:7px 11px;font-size:13.5px;font-weight:650;cursor:pointer;user-select:none;}
+  .kgchip input{accent-color:var(--green);width:16px;height:16px;}
+  .kgx{margin-left:2px;color:#a3322f;font-weight:800;font-size:12px;cursor:pointer;opacity:.55;padding:0 2px;border-radius:5px;}
+  .kgx:hover{opacity:1;background:#f4e0e0;}
+  .kgadd{display:flex;gap:6px;align-items:center;}
+  .kgadd input{width:84px;}
+
+  button{font:inherit;cursor:pointer;border:none;border-radius:10px;font-weight:650;}
+  .btn-primary{background:var(--green);color:#fff;padding:11px 16px;font-size:14px;box-shadow:0 2px 0 var(--green-deep);}
+  .btn-primary:hover{filter:brightness(1.04);}
+  .btn-gold{background:var(--gold);color:#1c1708;padding:11px 16px;font-size:14px;box-shadow:0 2px 0 var(--gold-deep);}
+  .btn-gold:hover{filter:brightness(1.04);}
+  .btn-ghost{background:var(--soft);color:#4a4435;padding:9px 13px;font-size:13.5px;border:1px solid var(--edge);}
+  .btn-ghost:hover{background:#efe9da;}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;}
+
+  table.editor{width:100%;border-collapse:collapse;}
+  table.editor th{font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);text-align:left;padding:4px 6px;font-weight:700;}
+  table.editor td{padding:4px 5px;}
+  table.editor select,table.editor input{width:100%;}
+  table.editor .basecol input{text-align:right;}
+  .delcol{width:42px;text-align:center;}
+  .del-btn{background:#f4e7e7;color:#a3322f;border:1px solid #e8cccc;border-radius:8px;padding:7px 9px;font-size:13px;}
+  .del-btn:hover{background:#efd9d9;}
+
+  .seg{display:inline-flex;background:#fff;border:1px solid var(--edge);border-radius:10px;padding:3px;gap:3px;}
+  .seg-btn{background:transparent;color:#4a4435;padding:7px 14px;font-size:13px;font-weight:650;border-radius:8px;}
+  .seg-btn.active{background:var(--gold);color:#1c1708;box-shadow:0 1px 0 var(--gold-deep);}
+  .preview-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+  .count-pill{background:#fff;border:1px solid var(--edge);border-radius:999px;padding:5px 12px;font-size:12.5px;color:var(--muted);font-weight:600;}
+
+  .mwrap{overflow-x:auto;}
+  table.master{width:100%;border-collapse:collapse;table-layout:fixed;}
+  table.master td{border:1px solid #8f8f8f;padding:7px 9px;font-size:13.5px;overflow:hidden;}
+  table.master .mkod,table.master .mh{background:var(--peach);font-weight:800;text-align:center;}
+  table.master .mn{font-weight:700;text-align:left;color:#1b1b1b;overflow-wrap:anywhere;word-break:break-word;line-height:1.15;}
+  table.master .mv{text-align:right;font-weight:600;color:#111;white-space:nowrap;}
+
+  #skladBox{display:flex;flex-direction:column;gap:22px;}
+  .sheet{background:#fff;border:1px solid var(--edge);border-radius:6px;padding:26px;
+    box-shadow:0 6px 22px rgba(40,30,10,.07);display:flex;flex-direction:column;justify-content:center;gap:24px;}
+  .sheet .skladtag{font-size:12px;font-weight:800;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:-6px;}
+  table.rt{width:100%;border-collapse:collapse;table-layout:fixed;}
+  table.rt td{border:1.5px solid var(--line);padding:9px 13px;font-size:15px;overflow:hidden;}
+  table.rt .hk{background:var(--gold);font-weight:800;width:70%;}
+  table.rt .hv{background:var(--green);font-weight:800;text-align:center;color:#10240a;}
+  table.rt .nm{font-weight:700;white-space:normal;overflow-wrap:anywhere;word-break:break-word;line-height:1.15;}
+  table.rt .vv{text-align:right;font-weight:800;color:#000;width:30%;white-space:nowrap;}
+
+  .empty-state{background:var(--card);border:1px dashed var(--edge);border-radius:14px;padding:42px 24px;text-align:center;color:var(--muted);}
+  footer.note{margin-top:22px;font-size:12px;color:var(--muted);text-align:center;}
+
+  /* PDF uchun offscreen A4 varaq (katta shrift, tepadan) */
+  .pdfsheet{position:absolute;left:-10000px;top:0;width:794px;background:#fff;padding:40px 42px;
+    box-sizing:border-box;display:flex;flex-direction:column;gap:34px;}
+  .pdfsheet .pskladtag{font-size:20px;font-weight:800;letter-spacing:1.5px;color:#6c6658;
+    text-transform:uppercase;margin-bottom:-22px;}
+  .pdfsheet table.rt td{font-size:26px;padding:15px 18px;}
+
+  @page{size:A4 portrait;margin:14mm;}
+  @media print{
+    body{background:#fff;}
+    .wrap{max-width:none;padding:0;margin:0;}
+    header.top,.card,.preview-head,footer.note,.no-print,#masterBox{display:none !important;}
+    #skladBox{display:flex !important;gap:0;}
+    .sheet{border:none;border-radius:0;box-shadow:none;padding:0;margin:0;min-height:247mm;
+      page-break-after:always;break-after:page;justify-content:flex-start;gap:20mm;}
+    .sheet:last-child{page-break-after:auto;break-after:auto;}
+    .sheet .skladtag{font-size:15px;margin-bottom:2mm;}
+    table.rt td{font-size:22px;padding:14px 16px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="mark"></div>
+    <div>
+      <h1>Рецептура яратиш</h1>
+      <div class="sub">Код ва кг'ни белгиланг, маҳсулотларни киритинг — қолган кг'лар автомат ҳисобланади.</div>
+    </div>
+  </header>
+
+  <div class="card">
+    <h2>Код ва ўлчамлар</h2>
+    <div class="grid" style="margin-bottom:16px;">
+      <div><label>KOD</label><input type="text" id="kod" value="#EB4" style="width:100%;"></div>
+      <div><label>Бирлик</label><input type="text" id="unit" value="кг" style="width:100%;"></div>
+      <div><label>Тўлиқ жадвал — хона</label><input type="number" id="decFull" min="0" max="4" value="3" style="width:100%;"></div>
+      <div><label>Склад лист — хона</label><input type="number" id="decSklad" min="0" max="4" value="2" style="width:100%;"></div>
+      <div><label>Листга нечта кг</label><input type="number" id="persheet" min="1" max="8" value="2" style="width:100%;"></div>
+    </div>
+    <label>Қайси кг'лар чиқсин (птичка)</label>
+    <div class="kgbox" id="kgbox"></div>
+    <div class="kgadd" style="margin-top:10px;">
+      <input type="number" id="kgnew" placeholder="янги кг" min="1">
+      <button class="btn-ghost" id="kgaddBtn" type="button">+ кг қўшиш</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Складлар номи</h2>
+    <div class="grid" id="names"></div>
+  </div>
+
+  <div class="card">
+    <h2>Маҳсулотлар (100 кг учун грамм)</h2>
+    <table class="editor">
+      <colgroup><col style="width:22%"><col style="width:48%"><col style="width:22%"><col style="width:8%"></colgroup>
+      <thead><tr><th>Склад</th><th>Маҳсулот номи</th><th>100 кг, г</th><th></th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <button class="btn-ghost" id="addRow" type="button" style="margin-top:10px;">+ Маҳсулот қўшиш</button>
+  </div>
+
+  <div class="card">
+    <h2>Юклаб олиш</h2>
+    <div class="actions">
+      <button class="btn-gold" id="excelBtn" type="button">Тўлиқ жадвал — Excel (.xls)</button>
+      <button class="btn-primary" id="pdfBtn" type="button">Склад листлари — PDF</button>
+    </div>
+    <div class="hint">Иккала файл ҳам <b>Downloads</b> папкасига автомат юкланади. (PDF катта, узоқдан ўқиладиган шрифтда.)</div>
+  </div>
+
+  <div class="preview-head">
+    <div class="seg no-print">
+      <button class="seg-btn active" data-mode="master" type="button">Тўлиқ жадвал</button>
+      <button class="seg-btn" data-mode="sklad" type="button">Склад листлари</button>
+    </div>
+    <div class="count-pill" id="pill">—</div>
+  </div>
+  <div id="masterBox"></div>
+  <div id="skladBox"></div>
+  <div class="empty-state" id="emptyState"><b>Ҳали маълумот йўқ.</b><br>Юқорида кодни ёзиб, маҳсулот қўшинг.</div>
+
+  <footer class="note">Маълумотлар фақат шу браузерда қолади — ҳеч қаёққа юборилмайди.</footer>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+/* ====== ANIQ HISOB (BigInt) ====== */
+function fmtRes(res, dec){
+  let s = res.toString();
+  if(dec===0) return s;
+  s = s.padStart(dec+1,'0');
+  return s.slice(0, s.length-dec) + ',' + s.slice(s.length-dec);
+}
+function calc(baseStr, kg, dec){
+  let s = String(baseStr).trim().replace(',', '.').replace(/\s+/g,'');
+  if(s==='' ) return '';
+  if(!/^\d*\.?\d*$/.test(s) || s==='.') return '';
+  let parts = s.split('.'); let intp = parts[0]||'0'; let frac = parts[1]||'';
+  if(intp==='') intp='0';
+  let p = frac.length;
+  let baseScaled = BigInt((intp+frac)||'0');
+  let A = baseScaled * BigInt(Math.round(kg)) * (10n ** BigInt(dec));
+  let B = (10n ** BigInt(p)) * 100n;
+  let res = (2n*A + B) / (2n*B);
+  return fmtRes(res, dec);
+}
+function calcNum(baseStr, kg, dec){
+  const v = calc(baseStr, kg, dec);
+  return v===''? null : parseFloat(v.replace(',','.'));
+}
+
+/* ====== HOLAT ====== */
+let batchOpts = [50,100,150,200,250,300,350];
+let checked = new Set([100,150,200,250,300,350]);
+let skladNames = {1:"Загатовка",2:"Спец 1",3:"Спец 2"};
+let mode = 'master';
+
+let rows = [
+ {s:1,name:"MDM ИМПОРТ",base:"19,334"},
+ {s:1,name:"ФИЛЕ",base:"22,556"},
+ {s:1,name:"ШКУРА ЭМУЛЬСЯ АРАМАДОН",base:"25,778"},
+ {s:1,name:"МУЗ",base:"19,334"},
+ {s:3,name:"ТУХУМ",base:"1,934"},
+ {s:2,name:"СОЯ",base:"0,58"},
+ {s:2,name:"СУХОЙ МОЛОКО",base:"0,708"},
+ {s:2,name:"КРАХМАЛ(Картофельный)",base:"4,834"},
+ {s:2,name:"КЛЕЧАТКА",base:"0,612"},
+ {s:3,name:"ТУЗ",base:"1,612"},
+ {s:3,name:"НИТРИТ",base:"0,004"},
+ {s:3,name:"ТРАНСГЛЮТАМИНАЗА(Tr 120)",base:"0,162"},
+ {s:3,name:"ДОКТОРСКАЯ(ИНГРИБИЛ)",base:"0,708"},
+ {s:3,name:"КОНСЕРВАНТ",base:"0,194"},
+ {s:3,name:"КАРАГИНАН СТАБ 030",base:"0,226"},
+ {s:3,name:"ШАКАР",base:"0,128"},
+ {s:3,name:"ПРОФ 200(Глобал Лине)",base:"1,16"},
+ {s:3,name:"Мясо №3(Глобал Лине)",base:"0,096"},
+ {s:3,name:"КРАСИТЕЛЬ ПУНЦОВЫЙ(Профи)",base:"0,046"},
+];
+
+const selectedBatches = () => batchOpts.filter(b=>checked.has(b)).sort((a,b)=>a-b);
+
+/* ====== KG ====== */
+function renderKg(){
+  const box = $('kgbox'); box.innerHTML='';
+  batchOpts.slice().sort((a,b)=>a-b).forEach(b=>{
+    const lab = document.createElement('label'); lab.className='kgchip';
+    const cb = document.createElement('input'); cb.type='checkbox'; cb.checked=checked.has(b);
+    cb.addEventListener('change', ()=>{ cb.checked? checked.add(b): checked.delete(b); renderAll(); });
+    lab.appendChild(cb); lab.appendChild(document.createTextNode(b+' кг'));
+    const x = document.createElement('span'); x.className='kgx'; x.textContent='✕'; x.title='ўчириш';
+    x.addEventListener('click', (e)=>{
+      e.preventDefault(); e.stopPropagation();
+      batchOpts = batchOpts.filter(v=>v!==b); checked.delete(b);
+      renderKg(); renderAll();
+    });
+    lab.appendChild(x);
+    box.appendChild(lab);
+  });
+}
+$('kgaddBtn').addEventListener('click', ()=>{
+  const v = parseInt($('kgnew').value);
+  if(!v || v<=0) return;
+  if(!batchOpts.includes(v)) batchOpts.push(v);
+  checked.add(v); $('kgnew').value=''; renderKg(); renderAll();
+});
+
+/* ====== Sklad nomlari ====== */
+const nameOf = n => (skladNames[n] && skladNames[n].trim()) ? skladNames[n].trim() : (n+'-склад');
+function renderNames(){
+  const box = $('names'); box.innerHTML='';
+  [1,2,3].forEach(s=>{
+    const d=document.createElement('div');
+    const lab=document.createElement('label'); lab.textContent=s+'-склад номи';
+    const inp=document.createElement('input'); inp.type='text'; inp.value=skladNames[s]; inp.style.width='100%';
+    inp.addEventListener('input', ()=>{ skladNames[s]=inp.value; renderRows(); renderAll(); });
+    d.appendChild(lab); d.appendChild(inp); box.appendChild(d);
+  });
+}
+
+/* ====== Editor ====== */
+function renderRows(){
+  const tb = $('rows'); tb.innerHTML='';
+  rows.forEach((r,i)=>{
+    const tr=document.createElement('tr');
+    const td1=document.createElement('td');
+    const sel=document.createElement('select');
+    [1,2,3].forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=nameOf(s);sel.appendChild(o);});
+    sel.value=r.s; sel.addEventListener('change',()=>{r.s=parseInt(sel.value);renderAll();});
+    td1.appendChild(sel);
+    const td2=document.createElement('td');
+    const nin=document.createElement('input');nin.type='text';nin.value=r.name;nin.placeholder='маҳсулот номи';
+    nin.addEventListener('input',()=>{r.name=nin.value;renderAll();});
+    td2.appendChild(nin);
+    const td3=document.createElement('td'); td3.className='basecol';
+    const bin=document.createElement('input');bin.type='text';bin.value=r.base;bin.placeholder='0,00';bin.inputMode='decimal';
+    bin.addEventListener('input',()=>{r.base=bin.value;renderAll();});
+    td3.appendChild(bin);
+    const td4=document.createElement('td'); td4.className='delcol';
+    const del=document.createElement('button');del.className='del-btn';del.type='button';del.textContent='✕';
+    del.addEventListener('click',()=>{rows.splice(i,1);renderRows();renderAll();});
+    td4.appendChild(del);
+    tr.append(td1,td2,td3,td4); tb.appendChild(tr);
+  });
+}
+$('addRow').addEventListener('click',()=>{ rows.push({s:1,name:'',base:''}); renderRows(); renderAll(); });
+
+/* ====== Master ====== */
+function renderMaster(){
+  const box=$('masterBox'); box.innerHTML='';
+  const kod=($('kod').value||'').trim();
+  const unit=($('unit').value||'').trim().toUpperCase();
+  const dec=Math.max(0,parseInt($('decFull').value)||0);
+  const bs=selectedBatches();
+  const valid=rows.filter(r=>r.name.trim()!=='');
+  if(!bs.length || !valid.length){ return; }
+  const t=document.createElement('table'); t.className='master';
+  const cg=document.createElement('colgroup');
+  const c0=document.createElement('col');c0.style.width='26%';cg.appendChild(c0);
+  bs.forEach(()=>{const c=document.createElement('col');c.style.width=(74/bs.length)+'%';cg.appendChild(c);});
+  t.appendChild(cg);
+  const h=t.insertRow();
+  const hk=h.insertCell();hk.className='mkod';hk.textContent=kod?('KOD: '+kod):'KOD';
+  bs.forEach(b=>{const c=h.insertCell();c.className='mh';c.textContent=b+(unit?(' '+unit):'');});
+  valid.forEach(r=>{
+    const tr=t.insertRow();
+    const c=tr.insertCell();c.className='mn';c.textContent=r.name;
+    bs.forEach(b=>{const cv=tr.insertCell();cv.className='mv';const v=calc(r.base,b,dec);cv.textContent=v===''?'—':v;});
+  });
+  const wrap=document.createElement('div');wrap.className='mwrap';wrap.appendChild(t);box.appendChild(wrap);
+}
+
+/* ====== Sklad listlari ====== */
+function chunk(a,n){const o=[];for(let i=0;i<a.length;i+=n)o.push(a.slice(i,i+n));return o;}
+function rtTable(kod, b, unit, ings, dec){
+  const t=document.createElement('table');t.className='rt';
+  const h=t.insertRow();
+  const hk=h.insertCell();hk.className='hk';hk.textContent=kod?('KOD: '+kod):'KOD';
+  const hv=h.insertCell();hv.className='hv';hv.textContent=b+(unit?(' '+unit):'');
+  ings.forEach(r=>{
+    const tr=t.insertRow();
+    const c1=tr.insertCell();c1.className='nm';c1.textContent=r.name;
+    const c2=tr.insertCell();c2.className='vv';const v=calc(r.base,b,dec);c2.textContent=v===''?'—':v;
+  });
+  return t;
+}
+
+function renderSklad(){
+  const box=$('skladBox'); box.innerHTML='';
+  const kod=($('kod').value||'').trim();
+  const unit=($('unit').value||'').trim();
+  const dec=Math.max(0,parseInt($('decSklad').value)||0);
+  const per=Math.max(1,parseInt($('persheet').value)||2);
+  const bs=selectedBatches();
+  const valid=rows.filter(r=>r.name.trim()!=='');
+  if(!bs.length || !valid.length){ return; }
+  const groups={}; valid.forEach(r=>{(groups[r.s]=groups[r.s]||[]).push(r);});
+  Object.keys(groups).map(Number).sort((a,b)=>a-b).forEach(sk=>{
+    const ings=groups[sk];
+    chunk(bs,per).forEach(group=>{
+      const sheet=document.createElement('div');sheet.className='sheet';
+      const tag=document.createElement('div');tag.className='skladtag';tag.textContent=nameOf(sk);sheet.appendChild(tag);
+      group.forEach(b=> sheet.appendChild(rtTable(kod,b,unit,ings,dec)) );
+      box.appendChild(sheet);
+    });
+  });
+}
+
+/* ====== Boshqaruv ====== */
+function renderAll(){
+  renderMaster(); renderSklad();
+  const bs=selectedBatches(); const valid=rows.filter(r=>r.name.trim()!=='');
+  const has = bs.length && valid.length;
+  $('emptyState').style.display = has ? 'none':'block';
+  $('masterBox').style.display = (has && mode==='master') ? 'block':'none';
+  $('skladBox').style.display  = (has && mode==='sklad')  ? 'flex':'none';
+  $('pill').textContent = has ? (valid.length+' маҳсулот · '+bs.length+' кг') : '—';
+}
+document.querySelectorAll('.seg-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.seg-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active'); mode=b.dataset.mode; renderAll();
+  });
+});
+['kod','unit','decFull','decSklad','persheet'].forEach(id=>$(id).addEventListener('input',renderAll));
+
+/* ====== Umumiy: yuklab olish ====== */
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function safeName(kod){ return (kod||'reseptura').replace(/[^\wА-Яа-яЁёЎўҚқҒғҲҳ\-]+/g,'')||'reseptura'; }
+function downloadBlob(parts, name, mime){
+  const blob = new Blob(parts, {type:mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); }, 1500);
+}
+
+/* ====== Excel (.xls, rangli, CDN-siz) ====== */
+$('excelBtn').addEventListener('click',()=>{
+  const kod=($('kod').value||'').trim();
+  const unit=($('unit').value||'').trim().toUpperCase();
+  const dec=Math.max(0,parseInt($('decFull').value)||0);
+  const bs=selectedBatches();
+  const valid=rows.filter(r=>r.name.trim()!=='');
+  if(!bs.length || !valid.length){ alert('Маҳсулот ёки кг танланмаган.'); return; }
+
+  let h='\ufeff<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"></head><body>';
+  h+='<table border="1" cellspacing="0" cellpadding="5" style="border-collapse:collapse;font-family:Arial;">';
+  h+='<tr>';
+  h+='<td bgcolor="#F4CBA4" align="center" style="font-weight:bold;">'+esc(kod?('KOD: '+kod):'KOD')+'</td>';
+  bs.forEach(b=>{ h+='<td bgcolor="#F4CBA4" align="center" style="font-weight:bold;">'+esc(b+(unit?(' '+unit):''))+'</td>'; });
+  h+='</tr>';
+  valid.forEach(r=>{
+    h+='<tr>';
+    h+='<td style="font-weight:bold;">'+esc(r.name)+'</td>';
+    bs.forEach(b=>{ const v=calc(r.base,b,dec); h+='<td align="right">'+(v===''?'':esc(v))+'</td>'; });
+    h+='</tr>';
+  });
+  h+='</table></body></html>';
+  downloadBlob([h], safeName(kod)+'_toliq_jadval.xls', 'application/vnd.ms-excel');
+});
+
+/* ====== Minimal PDF (JPEG sahifalardan, CDN-siz) ====== */
+function buildPdf(pages){
+  const PW=595.28, PH=841.89;
+  let num=3; const pieces=[]; const pageNums=[];
+  pages.forEach(p=>{
+    const pageN=num++, contentN=num++, imgN=num++; pageNums.push(pageN);
+    const content=`q\n${PW} 0 0 ${PH} 0 0 cm\n/Im Do\nQ\n`;
+    pieces.push({num:pageN, body:`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PW} ${PH}] /Resources << /XObject << /Im ${imgN} 0 R >> >> /Contents ${contentN} 0 R >>`});
+    pieces.push({num:contentN, body:`<< /Length ${content.length} >>\nstream\n${content}endstream`});
+    pieces.push({num:imgN, body:`<< /Type /XObject /Subtype /Image /Width ${p.w} /Height ${p.h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${p.jpg.length} >>\nstream\n${p.jpg}\nendstream`});
+  });
+  const all=[
+    {num:1, body:`<< /Type /Catalog /Pages 2 0 R >>`},
+    {num:2, body:`<< /Type /Pages /Kids [${pageNums.map(n=>n+' 0 R').join(' ')}] /Count ${pageNums.length} >>`},
+    ...pieces
+  ].sort((a,b)=>a.num-b.num);
+  let out='%PDF-1.4\n%\xFF\xFF\xFF\xFF\n'; const off={};
+  all.forEach(o=>{ off[o.num]=out.length; out+=`${o.num} 0 obj\n${o.body}\nendobj\n`; });
+  const xref=out.length; const n=all.length+1;
+  out+=`xref\n0 ${n}\n0000000000 65535 f \n`;
+  for(let i=1;i<n;i++) out+=String(off[i]).padStart(10,'0')+' 00000 n \n';
+  out+=`trailer\n<< /Size ${n} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
+  const u=new Uint8Array(out.length);
+  for(let i=0;i<out.length;i++) u[i]=out.charCodeAt(i)&0xff;
+  return u;
+}
+
+/* bitta list canvas: sklad tegi + 1-2 jadval (tepadan, katta shrift, nom katakka sig'adi) */
+function sheetCanvas(kod, unit, dec, skName, ings, kgs){
+  const W=1240, H=1754, M=64;
+  const cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+  const ctx=cv.getContext('2d');
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+  const usableW=W-2*M, usableH=H-2*M;
+  const nameW=Math.round(usableW*0.70), valW=usableW-nameW;
+  const nT=kgs.length, nIng=ings.length;
+  const factor = nT*(1+nIng) + nT*0.60 + (nT>1?(nT-1)*0.7:0);
+  let rowH=Math.min(120, Math.floor(usableH/factor)); rowH=Math.max(rowH,26);
+  const tagH=Math.round(rowH*0.60), gap=Math.round(rowH*0.7), pad=Math.round(rowH*0.28);
+  let y=M;
+  kgs.forEach((b,ti)=>{
+    // sklad tegi
+    ctx.fillStyle='#6c6658'; ctx.textBaseline='middle'; ctx.textAlign='left';
+    ctx.font=`bold ${Math.round(rowH*0.36)}px Arial`;
+    ctx.fillText(skName.toUpperCase(), M, y+tagH/2);
+    y+=tagH;
+    y=drawRt(ctx, M, y, nameW, valW, rowH, pad, kod, unit, b, ings, dec);
+    if(ti<kgs.length-1) y+=gap;
+  });
+  return cv;
+}
+function drawRt(ctx,x,y,nameW,valW,rowH,pad,kod,unit,kg,ings,dec){
+  const tw=nameW+valW, top=y;
+  ctx.textBaseline='middle';
+  // header
+  ctx.fillStyle='#d6ae37'; ctx.fillRect(x,y,nameW,rowH);
+  ctx.fillStyle='#000'; ctx.font=`bold ${Math.round(rowH*0.44)}px Arial`; ctx.textAlign='left';
+  ctx.fillText(kod?('KOD: '+kod):'KOD', x+pad, y+rowH/2);
+  ctx.fillStyle='#76ad4e'; ctx.fillRect(x+nameW,y,valW,rowH);
+  ctx.fillStyle='#000'; ctx.textAlign='center';
+  ctx.fillText(kg+(unit?(' '+unit):''), x+nameW+valW/2, y+rowH/2);
+  y+=rowH;
+  ings.forEach(r=>{
+    ctx.fillStyle='#fff'; ctx.fillRect(x,y,tw,rowH);
+    // nom — katakka sig'adigan qilib kichraytirish
+    let fs=Math.round(rowH*0.44); ctx.font=`bold ${fs}px Arial`;
+    const maxw=nameW-2*pad;
+    while(fs>11 && ctx.measureText(r.name).width>maxw){ fs--; ctx.font=`bold ${fs}px Arial`; }
+    ctx.fillStyle='#191919'; ctx.textAlign='left';
+    ctx.fillText(r.name, x+pad, y+rowH/2);
+    // qiymat
+    const v=calc(r.base,kg,dec); const val=v===''?'—':v;
+    ctx.fillStyle='#000'; ctx.font=`bold ${Math.round(rowH*0.46)}px Arial`; ctx.textAlign='right';
+    ctx.fillText(val, x+nameW+valW-pad, y+rowH/2);
+    y+=rowH;
+  });
+  const bottom=top+rowH*(ings.length+1);
+  ctx.strokeStyle='#282828'; ctx.lineWidth=2;
+  for(let i=0;i<=ings.length+1;i++){ ctx.beginPath(); ctx.moveTo(x,top+i*rowH); ctx.lineTo(x+tw,top+i*rowH); ctx.stroke(); }
+  [x,x+nameW,x+tw].forEach(vx=>{ ctx.beginPath(); ctx.moveTo(vx,top); ctx.lineTo(vx,bottom); ctx.stroke(); });
+  ctx.lineWidth=3; ctx.strokeRect(x,top,tw,bottom-top);
+  return bottom;
+}
+$('pdfBtn').addEventListener('click', ()=>{
+  const bs=selectedBatches(); const valid=rows.filter(r=>r.name.trim()!=='');
+  if(!bs.length || !valid.length){ alert('Маҳсулот ёки кг танланмаган.'); return; }
+  const kod=($('kod').value||'').trim();
+  const unit=($('unit').value||'').trim();
+  const dec=Math.max(0,parseInt($('decSklad').value)||0);
+  const per=Math.max(1,parseInt($('persheet').value)||2);
+  const groups={}; valid.forEach(r=>{(groups[r.s]=groups[r.s]||[]).push(r);});
+  const pages=[];
+  Object.keys(groups).map(Number).sort((a,b)=>a-b).forEach(sk=>{
+    chunk(bs,per).forEach(group=>{
+      const cv=sheetCanvas(kod,unit,dec,nameOf(sk),groups[sk],group);
+      const b64=cv.toDataURL('image/jpeg',0.92).split(',')[1];
+      pages.push({jpg:atob(b64), w:cv.width, h:cv.height});
+    });
+  });
+  const bytes=buildPdf(pages);
+  downloadBlob([bytes], safeName(kod)+'_sklad_listlari.pdf', 'application/pdf');
+});
+
+/* ====== start ====== */
+renderKg(); renderNames(); renderRows(); renderAll();
+</script>
+</body>
+</html>
